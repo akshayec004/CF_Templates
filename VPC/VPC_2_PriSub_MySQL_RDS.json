@@ -1,0 +1,176 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "CF template to create a VPC with 2 subnets, MySQL RDS Instance, DB Subnet Group and RDS Secuirty Group. Has DB Username and password as parameters",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "DB Configuration"
+                    },
+                    "Parameters": [
+                        "DBUser",
+                        "DBPassword"
+                    ]
+                }
+            ]
+        }
+    },
+    "Parameters": {
+        "DBUser": {
+            "Description": "Username MySQL database access",
+            "Type": "String",
+            "Default": "admin"
+        },
+        "DBPassword": {
+            "NoEcho": "true",
+            "Description": "Password MySQL database access",
+            "Type": "String",
+            "MinLength": "8",
+            "MaxLength": "41",
+            "AllowedPattern": "[a-zA-Z0-9]*",
+            "ConstraintDescription": "must contain only alphanumeric characters."
+        }
+    },
+    "Mappings": {},
+    "Conditions": {},
+    "Resources": {
+        "RDSDemoVpc": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": "10.0.0.0/16",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "RDSDemoVPC"
+                    }
+                ]
+            }
+        },
+        "PrivateSubnet1": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": "ap-south-1a",
+                "VpcId": {
+                    "Ref": "RDSDemoVpc"
+                },
+                "CidrBlock": "10.0.0.0/24",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "PrivateSubnet1"
+                    }
+                ]
+            }
+        },
+        "PrivateSubnet2": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": "ap-south-1b",
+                "VpcId": {
+                    "Ref": "RDSDemoVpc"
+                },
+                "CidrBlock": "10.0.1.0/24",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "PrivateSubnet2"
+                    }
+                ]
+            }
+        },
+        "rdsDBSubnetGroup": {
+            "Type": "AWS::RDS::DBSubnetGroup",
+            "Properties": {
+                "DBSubnetGroupDescription": "Subnet for RDS",
+                "SubnetIds": [
+                    {
+                        "Ref": "PrivateSubnet1"
+                    },
+                    {
+                        "Ref": "PrivateSubnet2"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "rdsDBSubnetGroup"
+                    }
+                ]
+            }
+        },
+        "rdsDBInstance": {
+            "Type": "AWS::RDS::DBInstance",
+            "Properties": {
+                "AllocatedStorage": "20",
+                "DBInstanceClass": "db.m5.large",
+                "AllowMajorVersionUpgrade": "false",
+                "AutoMinorVersionUpgrade": "false",
+                "BackupRetentionPeriod": "7",
+                "DBInstanceIdentifier": "MySQLDB",
+                "DBName": "RdsCf",
+                "DBSubnetGroupName": {
+                    "Ref": "rdsDBSubnetGroup"
+                },
+                "Engine": "MySQL",
+                "EngineVersion": "8.0.17",
+                "MasterUsername": {
+                    "Ref": "DBUser"
+                },
+                "MasterUserPassword": {
+                    "Ref": "DBPassword"
+                },
+                "MultiAZ": "false",
+                "Port": "3036",
+                "PubliclyAccessible": "false",
+                "StorageType": "gp2",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "MySQLDB"
+                    }
+                ],
+                "VPCSecurityGroups": [
+                    {
+                        "Ref": "RdsSG"
+                    }
+                ]
+            }
+        },
+        "RdsSG": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Security group for RDS Instance",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "3036",
+                        "ToPort": "3036",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "RDSDemoVpc"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "RDS SG"
+                    }
+                ]
+            }
+        }
+    },
+    "Outputs": {
+        "RDSInstance": {
+            "Value": {
+                "Ref": "rdsDBInstance"
+            }
+        },
+        "VPC": {
+            "Value": {
+                "Ref": "RDSDemoVpc"
+            }
+        }
+    }
+}

@@ -1,0 +1,202 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CF template to create a VPC and a private and public subnets",
+  "Metadata": {},
+  "Parameters": {
+    "VPCCidrBlock": {
+      "Description": "CIDR Block for VPC",
+      "Type": "String",
+      "Default": "10.0.0.0/16"
+    },
+    "PublicSubnetCidr": {
+      "Description": "CIDR Block for public subnet",
+      "Type": "String",
+      "Default": "10.0.0.0/24"
+    },
+    "PrivateSubnetCidr": {
+      "Description": "CIDR Block for private subnet",
+      "Type": "String",
+      "Default": "10.0.1.0/24"
+    },
+    "PublicAZ": {
+      "Description": "Choose Availiblity Zone for subnet",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "PrivateAZ": {
+      "Description": "Choose Availiblity Zone for subnet",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    }
+  },
+  "Mappings": {},
+  "Conditions": {},
+  "Resources": {
+    "MyCFVPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
+          "Ref": "VPCCidrBlock"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyCFVPC"
+          }
+        ]
+      }
+    },
+    "PublicSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "PublicAZ"
+        },
+        "VpcId": {
+          "Ref": "MyCFVPC"
+        },
+        "CidrBlock": {
+          "Ref": "PublicSubnetCidr"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Public-Subnet"
+          }
+        ]
+      }
+    },
+    "PrivateSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "PrivateAZ"
+        },
+        "VpcId": {
+          "Ref": "MyCFVPC"
+        },
+        "CidrBlock": {
+          "Ref": "PrivateSubnetCidr"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Private-Subnet"
+          }
+        ]
+      }
+    },
+    "Igw": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {}
+    },
+    "AttachGateway": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "MyCFVPC"
+        },
+        "InternetGatewayId": {
+          "Ref": "Igw"
+        }
+      }
+    },
+    "PublicRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "MyCFVPC"
+        }
+      }
+    },
+    "PublicRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "Igw"
+        }
+      }
+    },
+    "PublicRouteTableAssoc": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },    
+    "EIP": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "NatGateway": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "EIP",
+            "AllocationId"
+          ]
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnet"
+        }
+      }
+    },
+    "PrivateRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "MyCFVPC"
+        }
+      }
+    },
+    "PrivateRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "NatGateway"
+        }
+      }
+    },
+    "PrivateRouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PrivateSubnet"
+        },
+        "RouteTableId": {
+          "Ref": "PrivateRouteTable"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "VpcID": {
+      "Value": {
+        "Ref": "MyCFVPC"
+      }
+    },
+    "PublicSubnet": {
+      "Value": {
+        "Ref": "PublicSubnet"
+      }
+    },
+    "PrivateSubnet": {
+      "Value": {
+        "Ref": "PrivateSubnet"
+      }
+    }
+  }
+}

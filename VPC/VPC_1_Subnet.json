@@ -1,0 +1,66 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CF template to create a VPC and a subnet(private) in AZ. Has a Cidr block, Subnet range and AZ as parameters",
+  "Metadata": {},
+  "Parameters": {
+    "VPCCidrBlock": {
+      "Description": "CIDR Block for VPC",
+      "Type": "String",
+      "Default": "10.0.0.0/16"
+    },
+    "Subnet1": {
+      "Description": "CIDR Block for subnet",
+      "Type": "String",
+      "Default": "10.0.0.0/24"
+    },
+    "AZs": {
+      "Description": "Choose Availiblity Zone for subnet",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    }
+  },
+  "Mappings": {},
+  "Conditions": {},
+  "Resources": {
+    "MyCFVPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
+          "Ref": "VPCCidrBlock"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyCFVPC"
+          }
+        ]
+      }
+    },
+    "Subnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "AZs"
+        },
+        "VpcId": {
+          "Ref": "MyCFVPC"
+        },
+        "CidrBlock": {
+          "Ref": "Subnet1"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Subnet"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "VpcID": {
+      "Value": {
+        "Ref": "MyCFVPC"
+      }
+    }
+  }
+}

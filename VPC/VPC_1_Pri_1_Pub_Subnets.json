@@ -1,0 +1,169 @@
+{
+"AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "CF Template to create VPC with one public and one private subnets",
+    "Metadata": {},
+    "Parameters": {},
+    "Mappings": {},
+    "Conditions": {},
+    "Resources": {        
+        "Vpc": {
+          "Type": "AWS::EC2::VPC",
+          "Properties": {
+            "CidrBlock": "10.0.0.0/16",
+            "Tags":[
+                {
+                    "Key": "Name", 
+                    "Value":  "VPC via CF" 
+                }
+            ]
+          }
+        },
+        "Igw": {
+          "Type": "AWS::EC2::InternetGateway",
+          "Properties": {
+          "Tags":[              
+               { 
+                   "Key": "Name", 
+                   "Value":  "IGW via CF" 
+               }
+            ]
+          }
+        },
+        "Agw": {
+          "Type": "AWS::EC2::VPCGatewayAttachment",
+          "Properties": {
+            "VpcId": {
+                "Ref": "Vpc"
+            },
+            "InternetGatewayId": { 
+                "Ref": "Igw" 
+            }
+          }
+        },
+        "PublicSubnet": {
+          "Type": "AWS::EC2::Subnet",
+          "Properties": {
+            "VpcId": {
+                "Ref":"Vpc"
+            },
+            "CidrBlock": "10.0.0.0/24",              
+            "AvailabilityZone": {
+                "Fn::Select": [
+                    "0",
+                    {
+                        "Fn::GetAZs": ""
+                    }
+                ]
+            },
+            "Tags":[
+                {
+                    "Key": "Name", 
+                    "Value":  "Public Subnet via CF" 
+                }
+            ]
+          }
+        },
+        "PrivateSubnet": {
+          "Type": "AWS::EC2::Subnet",
+          "Properties": {
+            "VpcId": {
+                "Ref": "Vpc"
+            },
+            "CidrBlock": "10.0.1.0/24",
+            "AvailabilityZone": {
+                "Fn::Select": [
+                    "0",
+                    {
+                        "Fn::GetAZs": ""
+                    }
+                ]
+            },
+            "Tags":[
+                { 
+                    "Key": "Name", 
+                    "Value":  "Private Subnet via CF" 
+                }
+            ]
+          }
+        },
+        "PublicRouteTable": {
+          "Type": "AWS::EC2::RouteTable",
+          "Properties": {
+            "VpcId": {
+                "Ref": "Vpc"
+            },
+            "Tags":[
+                {
+                    "Key": "Name",
+                    "Value": "Route Table for Public subnet" 
+                }
+            ]
+          }
+        },       
+        "PublicRoute": {
+          "Type": "AWS::EC2::Route",
+          "Properties": {
+            "RouteTableId": {
+                "Ref": "PublicRouteTable"
+            },
+            "DestinationCidrBlock": "0.0.0.0/0",
+            "GatewayId": {
+                "Ref": "Igw"
+            }
+          }
+        },        
+        "PublicRouteTableAssoc": {
+          "Type": "AWS::EC2::SubnetRouteTableAssociation",
+          "Properties": {
+            "SubnetId": {
+                "Ref" : "PublicSubnet"
+            },
+            "RouteTableId": {
+                "Ref": "PublicRouteTable"
+            }
+          }
+        },       
+        "PrivateRouteTable": {
+          "Type": "AWS::EC2::RouteTable",
+          "Properties": {
+            "VpcId": {
+                "Ref": "Vpc"
+            },
+            "Tags":[
+                { 
+                    "Key": "Name", 
+                    "Value":  "Route table for Private Subnet" 
+                }
+            ]
+          }
+        },
+        "PrivateRouteTableAssoc": {
+          "Type": "AWS::EC2::SubnetRouteTableAssociation",
+          "Properties": {
+            "SubnetId": {
+                "Ref": "PrivateSubnet"
+            },
+            "RouteTableId": {
+                "Ref": "PrivateRouteTable"
+            }
+          }
+        }
+    },
+    "Outputs": {
+        "VPC": {
+            "Description": "VPC ID",
+            "Value": {
+                "Ref": "Vpc"
+            }
+        },
+        "AZ": {
+            "Description": "Availability Zone",
+            "Value": {
+                "Fn::GetAtt":[
+                    "PublicSubnet",
+                    "AvailabilityZone"
+                ]
+            }
+        }
+    }
+}
