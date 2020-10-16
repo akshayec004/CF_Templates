@@ -1,7 +1,9 @@
 # Cloud Formation Nested Templates
 
 Launch_Configuration.json - This is a CF template for creating Launch Configuration
+
 Auto_Scaling_Group.json - This is a CF template for creating Autoscaling group. Takes output of the template Launch_Configuration.json as an input.
+
 Compute_Stack.json - This is a nested stack to create LC and ASG
                      Parameters :
                      i). BucketName - S3 Bucket name where the CF templates are stored.
