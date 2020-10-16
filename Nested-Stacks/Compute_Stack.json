@@ -1,0 +1,43 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "",
+    "Metadata": {},
+    "Parameters": {
+        "BucketName": {
+            "Description": "S3 Bucket",
+            "Type": "String",
+            "Default": "cf-templates-ec011"
+        },
+        "BucketPath": {
+            "Description": "Path to template files",
+            "Type": "String",
+            "Default": "nested-stacks"
+        }
+    },
+    "Resources": {
+        "LCStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Sub": "https://${BucketName}.s3.amazonaws.com/${BucketPath}/Launch_Configuration.json"
+                }
+            }
+        },
+        "ASGStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "Parameters": {
+                    "LCNameParam": {
+                        "Fn::GetAtt": [
+                            "LCStack",
+                            "Outputs.LCName"
+                        ]
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${BucketName}.s3.amazonaws.com/${BucketPath}/Auto_Scaling_Group.json"
+                }
+            }
+        }
+    }
+}

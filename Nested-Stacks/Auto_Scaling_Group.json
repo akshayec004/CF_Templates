@@ -1,0 +1,28 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "CF Template to create Autoscaling Group. Takes Launch configuration as an input",
+    "Parameters": {
+        "LCNameParam": {
+            "Description": "Launch Configuration Name",
+            "Type": "String",
+            "Default": "MyLC"
+        }
+    },
+    "Resources": {
+        "ASG": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "AvailabilityZones": {
+                    "Fn::GetAZs": {
+                        "Ref": "AWS::Region"
+                    }
+                },
+                "LaunchConfigurationName": {
+                    "Ref": "LCNameParam"
+                },
+                "MaxSize": "1",
+                "MinSize": "1"
+            }
+        }
+    }
+}
