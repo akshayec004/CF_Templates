@@ -21,6 +21,7 @@ Steps to run a nested template :
 3. Create a stack in CF by uploading the template Compute_Stack.json
 
 Challenges Faced :
+
 In a nested stack, we can't pass List of values parameter (Ex : Subnets, Security Groups) from parent to child stacks. Resolution for this is to define a parameter of type CommaDelimitedList in the child stack and type list in the parent stack. Then, use the intrinsic function Fn::Join to convert the list into combined string in the resource section of the parent stack.
 
 Reference : https://aws.amazon.com/premiumsupport/knowledge-center/cloudformation-parameters-nested-stacks/
