@@ -12,6 +12,23 @@
             "Description": "Path to template files",
             "Type": "String",
             "Default": "nested-stacks"
+        },
+        "EnvironmentName": {
+            "Description": "EnvironmentName",
+            "Type": "String",
+            "Default": "Dev"
+        },
+        "VPC": {
+            "Description": "Select the VPC to deploy the LB",
+            "Type": "AWS::EC2::VPC::Id"
+        },
+        "Subnets": {
+            "Description": "Select the subnets to which load balancer need to be deployed",
+            "Type": "List<AWS::EC2::Subnet::Id>"
+        },
+        "SecuirtyGroup": {
+            "Description": "Select the Security group to be attached to the load balancer",
+            "Type": "List<AWS::EC2::SecurityGroup::Id>"
         }
     },
     "Resources": {
@@ -23,6 +40,38 @@
                 }
             }
         },
+        "LBStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "Parameters": {
+                    "EnvironmentName": {
+                        "Ref": "EnvironmentName"
+                    },
+                    "VPC": {
+                        "Ref": "VPC"
+                    },
+                    "Subnets": {
+                        "Fn::Join": [
+                            ",",
+                            {
+                                "Ref": "Subnets"
+                            }
+                        ]
+                    },
+                    "SecuirtyGroup": {
+                        "Fn::Join": [
+                            ",",
+                            {
+                                "Ref": "SecuirtyGroup"
+                            }
+                        ]
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${BucketName}.s3.amazonaws.com/${BucketPath}/Load_Balancer.yaml"
+                }
+            }
+        },
         "ASGStack": {
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
@@ -31,6 +80,12 @@
                         "Fn::GetAtt": [
                             "LCStack",
                             "Outputs.LCName"
+                        ]
+                    },
+                    "TargetGroupParam": {
+                        "Fn::GetAtt": [
+                            "LBStack",
+                            "Outputs.MyTargetGroup"
                         ]
                     }
                 },

@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CF Template to create a load balancer
+
+Parameters:
+  EnvironmentName:
+    Description: Environment Name
+    Type: String
+    Default: Dev
+
+  VPC:
+    Description: VPC where load balance need to be deployed
+    Type: AWS::EC2::VPC::Id
+
+  Subnets:
+    Description: Select the subnets to which load balancer need to be deployed
+    Type: CommaDelimitedList
+
+  SecuirtyGroup:
+    Description: Select the Security group to be attached to the load balancer
+    Type: CommaDelimitedList
+
+Resources:
+  MyLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub My-${EnvironmentName}-Load-Balancer
+      SecurityGroups: !Ref SecuirtyGroup
+      Subnets: !Ref Subnets
+      Tags:
+          - Key: Name
+            Value: !Sub ${EnvironmentName}-Load-Balancer
+      
+  MyLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref MyLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref MyTargetGroup  
+
+  MyTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${EnvironmentName}-target-group
+      VpcId: !Ref VPC
+      Port: 80
+      Protocol: HTTP 
+
+Outputs:
+  MyLBName:
+    Description: Load Balancer
+    Value: !Ref MyLoadBalancer
+  MyTargetGroup:
+    Description: Target Group
+    Value: !Ref MyTargetGroup
