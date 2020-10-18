@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This is a CF template to launch an EC2 instance with httpd service created via cf-init
+
+Parameters: 
+  EnvName:
+    Description: Environment
+    Type: String
+    Default: Dev
+    AllowedValues:
+        - "Dev"
+        - "Uat"
+        - "Prod"
+  InstanceType:
+    Description: Select EC2 instance type 
+    Type: String
+    Default: "t2.micro"
+    AllowedValues: 
+      - "t2.micro"
+      - "m1.small"
+      - "m1.large"
+  Subnet:
+    Description: Select the subnet ID where EC2 need to be launched
+    Type: AWS::EC2::Subnet::Id
+  SecurityGroups:
+    Description: Select the Security Group for the instance
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  EC2KP:
+    Description: Keypair for rhe instnace
+    Type: AWS::EC2::KeyPair::KeyName
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      HVM64: "ami-0ff8a91507f77f867"
+    us-west-1:
+      HVM64: "ami-0bdb828fd58c52235"
+    eu-west-1:
+      HVM64: "ami-047bb4163c506cd98"
+    ap-southeast-1:
+      HVM64: "ami-08569b978cc4dfa10"
+    ap-south-1:
+      HVM64: "ami-0e306788ff2473ccb"      
+
+Conditions:
+  CreateDevResource: !Equals [!Ref EnvName, Dev ]
+
+Resources: 
+  MyWebServer:
+    Type: AWS::EC2::Instance
+    Condition: CreateDevResource
+    Metadata: 
+      AWS::CloudFormation::Init: 
+        configSets: 
+          Install_Dependency:
+          - Install_httpd 
+        Install_httpd:
+          packages:
+            yum:
+              httpd: []
+          services:
+            sysvinit:
+              httpd:
+                enabled: true
+                ensureRunning: true
+          files:
+            /var/www/html/index.html:
+              content: |
+                Happy Learning!!  Happy Learning!! This is created via cf-init!!   
+    Properties:
+      KeyName: !Ref EC2KP
+      ImageId: !FindInMap [ RegionMap, !Ref AWS::Region, HVM64 ]
+      InstanceType: !Ref InstanceType
+      SecurityGroupIds: !Ref SecurityGroups
+      UserData:
+        Fn::Base64: !Sub |
+           #!/bin/bash -xe
+           yum update -y
+           yum update -y aws-cfn-bootstrap
+           /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource MyWebServer --configsets Install_Dependency --region ${AWS::Region}
+      Tags:
+        - Key: Name
+          Value: !Sub My-${EnvName}-EC2-Instance
+
+Outputs:
+  MyWebServer:
+    Description: Public DNS name of the Web server
+    Value: !GetAtt MyWebServer.PublicDnsName
