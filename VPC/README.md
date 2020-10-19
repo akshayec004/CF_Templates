@@ -1,4 +1,4 @@
-# CloudFormation Templates for lauching VPC and its components
+# CloudFormation Templates for launching VPC and its components
 VPC Components - VPC, Subnets, InternetGateway, GatewayAttachment, RouteTable, Route Creation, SubnetRouteTableAssociation
 
 VPC_1_Pri_1_Pub_Subnets.json - CF Template to create a VPC with one public and one private subnets. No parameters.
