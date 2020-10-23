@@ -1,0 +1,22 @@
+{
+  "Parameters" : {
+    "VPCCidrBlock" : "10.0.0.0/16",
+    "PublicSubnetCidr":  "10.0.0.0/28",
+    "PrivateSubnetCidr": "10.0.1.0/24",
+    "PublicAZ": "ap-south-1a",
+    "PrivateAZ": "ap-south-1b"
+  },
+  "Tags" : {
+    "Department" : "Finance"
+  },
+  "StackPolicy" : {
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "NotAction" : "Update:Delete",
+        "Principal": "*",
+        "Resource" : "*"
+      }
+    ]
+  }
+}
