@@ -12,15 +12,3 @@ VPC_2_PriSub_MySQL_RDS.json - CF template to create a VPC with 2 subnets, MySQL 
 VPC_Pri_Pub_Subnets_NAT.json - CF Template to create a VPC and a private and public subnets. Private subnet has internet access via NAT gateway. Parameters - VPC Cidr block, Pubic Subnet Cidr, Private Subnet Cidr, Public AZ and Private AZ.
 
 Template_Config.json - Template configuration file for CF templates. Contains parameters, tags and stack plcy for the CF stack
-
-# To integrate Cloudformation templates with CodeCommit/Github and CodePipeline
-1. Create a AWS CloudFormation service role with permission to PowerUser policy in IAM. This role is to be assumed by the Cloudformation. Policy depends on the resources to be created in the CF templates.
-2. Store your CloudFormation templates in SCM - Github or CodeCommit along with template configuration file which stores the parameters, Tags and Stack policy details for the CF stack. 
-3. Go to CodePipeline and select Create New Pipeline
-4. Enter name and create a new service role for CodePipeline if it doesn't exist or select the existing role
-5. Select Source Provider as CodeCommit or Github
-6. Enter the repository and branch details
-7. Skip the build stage
-8. In the deploy stage, select Deploy provider as 'AWS CloudFormation' and Action mode as 'Create or update Stack'
-9. Enter a stack name and provide the template and template configuration(optional) files path. Select the role created in the step 1
-10. Click next and review the parameter. Create the pipeline. The pipeline gets triggered immediately and create the CF stack.
