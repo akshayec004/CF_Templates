@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This is a CF template to create S3 bucket
+Resources: 
+  s3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+        - Key: Purpose
+          Value: Jenkins
+Outputs:
+  BucketName:
+    Description: Name of the S3 bucket
+    Value: !Ref s3Bucket
