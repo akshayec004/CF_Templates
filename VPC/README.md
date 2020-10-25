@@ -14,7 +14,7 @@ VPC_Pri_Pub_Subnets_NAT.json - CF Template to create a VPC and a private and pub
 Template_Config.json - Template configuration file for CF templates. Contains parameters, tags and stack plcy for the CF stack
 
 # To integrate Cloudformation templates with CodeCommit/Github and CodePipeline
-1. Create a AWS CloudFormation server role with permission to PowerUser policy in IAM.
+1. Create a AWS CloudFormation service role with permission to PowerUser policy in IAM. This role is to be assumed by the Cloudformation. Policy depends on the resources to be created in the CF templates.
 2. Store your CloudFormation templates in SCM - Github or CodeCommit along with template configuration file which stores the parameters, Tags and Stack policy details for the CF stack. 
 3. Go to CodePipeline and select Create New Pipeline
 4. Enter name and create a new service role for CodePipeline if it doesn't exist or select the existing role
