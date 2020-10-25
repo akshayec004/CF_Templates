@@ -1,4 +1,4 @@
-# Cloud Formation Nested Templates
+# CloudFormation Nested Templates
 Load_Balancer.yaml - This is a CF template for creating application load balancer. Input parameters - EnvironmentName, VPC, Subnets, SecurityGroup
 
 Launch_Configuration.json - This is a CF template for creating Launch Configuration
