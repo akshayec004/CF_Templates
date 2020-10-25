@@ -20,6 +20,5 @@ VPC - VPC, Subnets, InternetGateway, GatewayAttachment, RouteTable, Route Creati
 3. Attach the instance profile created in the above step to EC2 instance where job would be executed. or Note down the access key ID and secret key of the IAM user created
 4. Create a jenkins job and configure Github repository and cloudformation settings in the build environment. Add the access and secret keys.
 5. Build the job and go to AWS CloudFormation console and check if the stack is created or not.
-6. Create a pipeline job with below AWS CLI command.
-
+6. Create a pipeline job with the AWS CLI command - 
 aws cloudformation create-stack --stack-name <stack-name> --template-body file://<CF-Template-File> --region <AWS Region>
