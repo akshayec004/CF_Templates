@@ -8,12 +8,12 @@ Auto_Scaling_Group.json - This is a CF template for creating Autoscaling group. 
 Compute_Stack.json - This is a nested stack to create LC, ALB and ASG
                      
 Parameters :
-i). BucketName - S3 Bucket name where the CF templates are stored.
-ii). BucketPath - Path inside the bucket where the templates are stored.
-iii). EnvironmentName - Dev
-iv). VPC 
-v). Subnets
-vi). SecurityGroups
+* BucketName - S3 Bucket name where the CF templates are stored.
+* BucketPath - Path inside the bucket where the templates are stored.
+* EnvironmentName - Dev
+* VPC 
+* Subnets
+* SecurityGroups
 
 ## Steps to run a nested template :
 * Create an S3 bucket (Ex: cf-templates-xyz)
