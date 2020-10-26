@@ -15,12 +15,12 @@ iv). VPC
 v). Subnets
 vi). SecurityGroups
 
-Steps to run a nested template :
-1. Create an S3 bucket (Ex: cf-templates-xyz)
-2. Create a folder (Ex: nested-templates) and upload the files - Launch_Configuration.json, Load_Balancer.yaml and Auto_Scaling_Group.json
-3. Create a stack in CF by uploading the template Compute_Stack.json
+## Steps to run a nested template :
+* Create an S3 bucket (Ex: cf-templates-xyz)
+* Create a folder (Ex: nested-templates) and upload the files - Launch_Configuration.json, Load_Balancer.yaml and Auto_Scaling_Group.json
+* Create a stack in CF by uploading the template Compute_Stack.json
 
-Challenges Faced :
+## Challenges Faced :
 
 In a nested stack, we can't pass List of values parameter (Ex : Subnets, Security Groups) from parent to child stacks. Resolution for this is to define a parameter of type CommaDelimitedList in the child stack and type list in the parent stack. Then, use the intrinsic function Fn::Join to convert the list into combined string in the resource section of the parent stack.
 
