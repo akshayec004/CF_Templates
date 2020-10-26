@@ -22,7 +22,7 @@ Consider two VPCs - VPC-A (called as requestor VPC) and VPC-B (called as peer VP
 * Login in to account containing VPC-A. Go to the VPC peering and create a new connection. Select the requestor VPC ID (here VPC-A) and enter the account and region of the peer VPC ( here VPC-B). 
 * Go the account containing VPC-B. Accept the peering request from VPC-A in the VPC.
 * To enable the flow of traffic between the VPCs, manually add a route to one or more VPC route tables as below.
- i. Add a route in the route table of Public-A subnet to allow traffic from IP addresses of the private-B subnet.
- ii. Add a route in the route table of Private-B subnet to allow traffic from IP addresses pf the public-A subnet.
+  - Add a route in the route table of Public-A subnet to allow traffic from IP addresses of the Private-B subnet.
+  - Add a route in the route table of Private-B subnet to allow traffic from IP addresses of the Public-A subnet.
 * Provision EC2 instances in the Public-A and Private-B subnets
 * Connect to the EC2 instance provisioned in the Public-A subnet using its public address and try to ping the private IP address of the EC2 instance provisioned in the Private-B subnet. We should get a successfull response if everything is configured properly.
