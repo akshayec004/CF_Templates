@@ -1,10 +1,9 @@
-# Cloud Formation Templates For Launching EC2 Instances
-EC2_Instance.json - CF tempate to create EC2 instance with Amazon Linux Operating System, Input parameters are EC2 Key Value pair, Instance Type, SSH Location
+# Cross-Account Access with IAM Roles
 
-EC2_Env.yml - CF template to create an EC2 instance. Parameters are Environment, InstanceType, Subnet, SecurityGroups and KeyValuePair with condition for Environment parameter.
-
-EC2_Userdata.yml - CF template to launch an EC2 instance with httpd service created via commands in the userdata section
-
-EC2_Env_IAM_Role.yml - CF template to create an EC2 instance with full access to S3. Parameters are Environment, InstanceType, Subnet, SecurityGroups and KeyValuePair
-
-EC2_Cf-Init.yml - CF template to launch an EC2 instance with httpd service created via cf-init
+Consider two AWS accounts - prod and dev. To allow IAM user (Ex:developer) in the dev account to have read/write permissions for a specific bucket in the prod account, follow below steps.
+* Login to the prod account, create a policy 'read-write-prod-bucket' in IAM with read/write permissions for the specific bucket in the prod account
+* Create a role in the prod account with 'Another AWS account' as a type of trusted entity. Enter the dev account ID and attach a policy read-write-prod-bucket created in the step 1.
+* Login to the dev account, create a policy 'allow-assume-role-in-prod' with permission to assume the role created in the step 2.
+* Create an IAM user 'developer' and attach the policy created in the step 3. 
+* Login to dev account with the user 'developer' and switch role by entering the prod account ID and role ARN.
+* Go to S3 and try to list/read/write objects in the bucket that you have permission to. If everything is setup correctly, we should be able to perform these operations.
