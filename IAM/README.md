@@ -6,4 +6,4 @@ Consider two AWS accounts - prod and dev. To allow IAM user (Ex:developer) in th
 * Login to the dev account, create a policy 'allow-assume-role-in-prod' with permission to assume the role created in the step 2.
 * Create an IAM user 'developer' and attach the policy created in the step 3. 
 * Login to dev account with the user 'developer' and switch role by entering the prod account ID and role ARN.
-* Go to S3 and try to list/read/write objects in the bucket that you have permission to. If everything is setup correctly, we should be able to perform these operations.
+* Go to S3 and try to list buckets or read/write objects in the bucket that you have permission to. If everything is setup correctly, we should be able to perform these operations.
