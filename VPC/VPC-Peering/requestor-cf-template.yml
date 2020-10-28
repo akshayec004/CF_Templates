@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This is a CF template to create VPC in the requestor account and VPC peering connection
+Parameters: 
+  PeerAcceptorAccountId:
+    Description: Peer Acceptor Account ID
+    Type: Number
+  PeerAcceptorVPCId:
+    Description: Peer Acceptor VPC ID
+    Type: String
+  PeerRegion:
+    Description: Peer Acceptor VPC Region 
+    Type: String
+    Default: 'ap-southeast-1'
+  PeerRoleArn:
+    Description: Peer Role to be assumed by the requestor account
+    Type: String        
+  VPCCidrBlock:
+    Description: Cidr Block for the VPC in the requestor account
+    Type: String
+    Default: 10.16.0.0/16
+Resources: 
+  requestorVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCidrBlock
+      Tags:
+        - Key: Name
+          Value: Requestor-VPC
+  vpcPeeringConnection:
+    Type: 'AWS::EC2::VPCPeeringConnection'
+    Properties:
+      VpcId: !Ref requestorVPC
+      PeerVpcId: !Ref PeerAcceptorVPCId
+      PeerOwnerId: !Ref PeerAcceptorAccountId
+      PeerRegion: !Ref PeerRegion
+      PeerRoleArn: !Ref PeerRoleArn
+Outputs:
+  requestorVPCId:
+    Description: VPC Id in the requestor account
+    Value: !Ref requestorVPC
+  vpcPeeringConnection:
+    Description: VPC Peering Connection Id
+    Value: !Ref vpcPeeringConnection

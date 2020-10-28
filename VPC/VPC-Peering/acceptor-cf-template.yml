@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This is a CF template to create a VPC and role to be assumed by the requestor account. This should be executed in the acceptor account
+Parameters: 
+  PeerRequesterAccountId:
+    Description: Peer Requestor Account ID
+    Type: Number
+  VPCCidrBlock:
+    Description: Cidr Block for the VPC in the acceptor account
+    Type: String
+    Default: 172.31.0.0/16
+Resources: 
+  acceptorVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCidrBlock
+      Tags:
+        - Key: Name
+          Value: Acceptor-VPC
+  peerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument: 
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              AWS: 
+                !Ref PeerRequesterAccountId
+      Policies:
+        - 
+         PolicyName: "VPCPeeringPermission"
+         PolicyDocument:
+           Version: "2012-10-17"
+           Statement:
+              - Effect: Allow
+                Action: 'ec2:acceptVpcPeeringConnection'
+                Resource: '*'
+Outputs:
+  AcceptorVPCId:
+    Description: VPC Id in the acceptor account
+    Value: !Ref acceptorVPC
+  PeerRoleARN:
+    Description: Information about the value
+    Value: !GetAtt peerRole.Arn
