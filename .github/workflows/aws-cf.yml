@@ -31,7 +31,7 @@ jobs:
           run: |
             aws s3 ls
 
-        - name: Provide Execute Permission
+        - name: Provide execute permission
           run: |
             chmod u+x ./scripts/aws-cf-s3.sh
 	    
