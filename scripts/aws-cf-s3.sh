@@ -1,7 +1,10 @@
 #!/bin/bash
 
+export AWS_DEFAULT_REGION="ap-south-1"
+export AWS_DEFAULT_OUTPUT="text"
 echo "Creating S3 Bucket via CF Stack"
 STACK_ID="$(aws cloudformation create-stack --stack-name s3bucket --template-body file://S3/S3_Create_Bucket.yaml --region 'ap-south-1')"
+echo "$STACK_ID"
 while true; do
   echo "Checking stack creation for $STACK_ID, please wait."
   STACK_STATUS="$(aws cloudformation describe-stacks --query 'Stacks[?StackId==`'"$STACK_ID"'`].StackStatus')"
