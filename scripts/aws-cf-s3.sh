@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Creating S3 Bucket via CF Stack"
-STACK_ID = $(aws cloudformation create-stack --stack-name s3bucket --template-body file://S3/S3_Create_Bucket.yaml --region 'ap-south-1')
+STACK_ID="$(aws cloudformation create-stack --stack-name s3bucket --template-body file://S3/S3_Create_Bucket.yaml --region 'ap-south-1')"
 while true; do
   echo "Checking stack creation, please wait."
   STACK_STATUS="$(aws cloudformation describe-stacks --query 'Stacks[?StackId==`'"$STACK_ID"'`].StackStatus')"
